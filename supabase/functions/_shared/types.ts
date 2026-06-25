@@ -32,7 +32,7 @@ export interface World {
 export interface WorldState {
   id: string;
   worldId: string;
-  currentDate: string;
+  worldDate: string; // DB 欄位 world_date（current_date 為保留字）
   season?: string;
   weatherPattern?: string;
   locationState?: string;
@@ -46,7 +46,7 @@ export interface Character {
   name: string;
   personaCore: string;
   backstory?: string;
-  values?: string;
+  coreValues?: string;
   voiceStyle?: string;
   occupation?: string;
   routine?: string;

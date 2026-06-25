@@ -38,7 +38,7 @@ create table worlds (
 create table world_states (
   id uuid primary key default uuid_generate_v4(),
   world_id uuid not null references worlds(id) on delete cascade,
-  current_date date not null,
+  world_date date not null,         -- 世界當前日期（current_date 是保留字，故改名）
   season text,
   weather_pattern text,
   location_state text,
@@ -47,7 +47,7 @@ create table world_states (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-create index idx_world_states_world on world_states(world_id, current_date desc);
+create index idx_world_states_world on world_states(world_id, world_date desc);
 
 -- ── characters：角色核心設定（Character Canon，§4.3）─────────
 create table characters (
@@ -56,7 +56,7 @@ create table characters (
   name text not null,
   persona_core text not null,
   backstory text,
-  values text,
+  core_values text,                 -- values 是保留字，故改名
   voice_style text,
   occupation text,
   routine text,
