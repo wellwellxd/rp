@@ -7,6 +7,7 @@ export function App() {
   const [messages, setMessages] = useState<ChatTurn[]>([]);
   const [input, setInput] = useState('');
   const [pending, setPending] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,10 +29,7 @@ export function App() {
       });
       setMessages([...history, { role: 'assistant', content: reply }]);
     } catch (err) {
-      setMessages([
-        ...history,
-        { role: 'assistant', content: `（發生錯誤：${String(err)}）` },
-      ]);
+      setMessages([...history, { role: 'assistant', content: `（發生錯誤：${String(err)}）` }]);
     } finally {
       setPending(false);
     }
@@ -46,7 +44,67 @@ export function App() {
 
   return (
     <div className="app">
-      <aside className="sidebar">
+      <header className="appbar">
+        <button
+          className="icon-btn"
+          aria-label="角色與近期生活"
+          onClick={() => setDrawerOpen(true)}
+        >
+          ☰
+        </button>
+        <div className="title-block">
+          <div className="name">{character.name}</div>
+          <div className="sub">
+            {world.name} · {world.season} · {world.weather}
+          </div>
+        </div>
+        <span className={`badge${isLiveBackend ? ' live' : ''}`}>
+          {isLiveBackend ? '已接後端' : 'Demo'}
+        </span>
+      </header>
+
+      <div className="messages">
+        {messages.length === 0 && (
+          <div className="empty-hint">
+            試著問問「今天過得怎麼樣？」
+            <br />
+            {character.name} 會從自己的近期生活聊起。
+          </div>
+        )}
+        {messages.map((m, i) => (
+          <div className={`msg ${m.role}`} key={i}>
+            <div className="bubble">
+              <div className="who">{m.role === 'user' ? '你' : character.name}</div>
+              {m.content}
+            </div>
+          </div>
+        ))}
+        {pending && <div className="typing">{character.name} 正在回覆…</div>}
+        <div ref={endRef} />
+      </div>
+
+      <div className="composer">
+        <textarea
+          rows={1}
+          value={input}
+          placeholder="說點什麼…"
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={onKeyDown}
+        />
+        <button onClick={handleSend} disabled={pending || !input.trim()}>
+          送出
+        </button>
+      </div>
+
+      {/* 抽屜：角色 / 世界 / 近期生活 */}
+      <div
+        className={`scrim${drawerOpen ? ' open' : ''}`}
+        onClick={() => setDrawerOpen(false)}
+      />
+      <aside className={`drawer${drawerOpen ? ' open' : ''}`}>
+        <button className="drawer-close" aria-label="關閉" onClick={() => setDrawerOpen(false)}>
+          ✕
+        </button>
         <h1>{character.name}</h1>
         <p className="role">{character.occupation}</p>
 
@@ -69,50 +127,6 @@ export function App() {
           </div>
         ))}
       </aside>
-
-      <main className="chat">
-        <header className="chat-header">
-          <span className="title">與 {character.name} 對話</span>
-          {isLiveBackend ? (
-            <span className="badge live">已接後端</span>
-          ) : (
-            <span className="badge">Demo 模式 · 本機示意回覆</span>
-          )}
-        </header>
-
-        <div className="messages">
-          {messages.length === 0 && (
-            <div className="empty-hint">
-              試著問問「今天過得怎麼樣？」
-              <br />
-              {character.name} 會從自己的近期生活聊起。
-            </div>
-          )}
-          {messages.map((m, i) => (
-            <div className={`msg ${m.role}`} key={i}>
-              <div className="bubble">
-                <div className="who">{m.role === 'user' ? '你' : character.name}</div>
-                {m.content}
-              </div>
-            </div>
-          ))}
-          {pending && <div className="typing">{character.name} 正在回覆…</div>}
-          <div ref={endRef} />
-        </div>
-
-        <div className="composer">
-          <textarea
-            rows={1}
-            value={input}
-            placeholder="說點什麼…（Enter 送出、Shift+Enter 換行）"
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={onKeyDown}
-          />
-          <button onClick={handleSend} disabled={pending || !input.trim()}>
-            送出
-          </button>
-        </div>
-      </main>
     </div>
   );
 }
