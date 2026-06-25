@@ -15,18 +15,37 @@ export interface ChatOptions {
   system: string;
   messages: { role: 'user' | 'assistant'; content: string }[];
   temperature?: number;
+  maxTokens?: number;
 }
 
 /** 產生一段文字回覆（roleplay / diary / summary 共用）。 */
-export async function chat(_opts: ChatOptions): Promise<string> {
-  // TODO(phase-2)：POST `${BASE_URL}/chat/completions`，帶 Authorization: Bearer apiKey()。
-  void apiKey;
-  throw new Error('not implemented');
+export async function chat(opts: ChatOptions): Promise<string> {
+  const res = await fetch(`${BASE_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey()}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: opts.model,
+      messages: [{ role: 'system', content: opts.system }, ...opts.messages],
+      temperature: opts.temperature ?? 0.8,
+      max_tokens: opts.maxTokens ?? 600,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
+  }
+  const data = await res.json();
+  const content = data?.choices?.[0]?.message?.content;
+  if (typeof content !== 'string') {
+    throw new Error(`OpenRouter unexpected response: ${JSON.stringify(data).slice(0, 300)}`);
+  }
+  return content;
 }
 
 /** 產生 embedding（記憶檢索用），維度需對齊 DB schema 的 vector(1536)。 */
 export async function embed(_text: string): Promise<number[]> {
   // TODO(phase-5)：POST `${BASE_URL}/embeddings`。
-  void BASE_URL;
   throw new Error('not implemented');
 }

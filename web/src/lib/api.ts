@@ -29,6 +29,7 @@ export async function sendMessage(input: SendMessageInput): Promise<SendMessageR
       sessionId: input.sessionId,
       characterId: input.characterId,
       message: input.message,
+      history: input.history,
     },
   });
   if (error) throw error;
