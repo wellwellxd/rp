@@ -24,7 +24,7 @@ jobs:
     env:
       # 在 repo 的 Settings → Secrets and variables → Actions 設定這兩個（公開可見的值）。
       VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-      VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
       # base 路徑：專案頁面為 /<repo>/；custom domain 改設為 /
       VITE_BASE: ${{ vars.VITE_BASE || '/rp-claude/' }}
     steps:
