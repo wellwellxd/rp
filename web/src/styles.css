@@ -14,15 +14,26 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-html, body, #root { height: 100%; margin: 0; }
+html {
+  height: 100%;
+  /* iOS：避免旋轉時文字被自動放大 */
+  -webkit-text-size-adjust: 100%;
+}
+
+body, #root { height: 100%; margin: 0; }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, "Noto Sans TC", sans-serif;
+  /* iOS 優先使用 SF Pro / 蘋方 */
+  font-family: -apple-system, "PingFang TC", system-ui, "Noto Sans TC", sans-serif;
   line-height: 1.6;
   overscroll-behavior: none;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* 觸控元件去除 300ms 點擊延遲 */
+.icon-btn, .composer button, .drawer-close { touch-action: manipulation; }
 
 /* 手機優先：單欄，滿版高度。桌面上限制寬度，呈現手機般的版面。 */
 .app {
