@@ -51,6 +51,8 @@ npm run dev
 
 ## 目前狀態
 
-骨架階段：前端骨架（`web/`）、Edge Functions 骨架（`supabase/functions/`）、DB schema + RLS、
-領域型別、prompt、CI 部署與分階段計劃皆已就緒。各 function / 模組為帶有契約與
-`TODO(phase-N)` 的 stub，依 [docs/plan.md](docs/plan.md) 逐階段實作，從 **P0 → P1 → P2 → P3** 開始。
+**可運作**：登入 → 選角色 → 對話（真 LLM）→ 對話存進 DB、可回看每段 session。
+後端在 Supabase（Auth + Postgres + Edge Function `roleplay`），LLM 走 OpenRouter。
+
+👉 **接手 / 開新 session 請先讀 [docs/STATUS.md](docs/STATUS.md)** —— 完整現況、雲端資源、如何跑/部署、下一步候選。
+分階段計劃見 [docs/plan.md](docs/plan.md)。
