@@ -1,10 +1,8 @@
-import { supabase } from './supabase';
+import { supabase, isConfigured } from './supabase';
 import { mockReply, type ChatTurn } from './mockBackend';
 
 // 是否已設定真正的後端。未設定時走本機 mock，讓 UI 能即時開發與檢視。
-export const isLiveBackend = Boolean(
-  import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
-);
+export const isLiveBackend = isConfigured;
 
 export interface SendMessageInput {
   sessionId?: string;
@@ -26,7 +24,7 @@ export async function sendMessage(input: SendMessageInput): Promise<SendMessageR
     return { reply: mockReply(input.history, input.message) };
   }
 
-  const { data, error } = await supabase.functions.invoke('roleplay', {
+  const { data, error } = await supabase!.functions.invoke('roleplay', {
     body: {
       sessionId: input.sessionId,
       characterId: input.characterId,
@@ -39,7 +37,7 @@ export async function sendMessage(input: SendMessageInput): Promise<SendMessageR
 
 export async function endSession(sessionId: string) {
   if (!isLiveBackend) return { ok: true };
-  const { data, error } = await supabase.functions.invoke('session-summary', {
+  const { data, error } = await supabase!.functions.invoke('session-summary', {
     body: { sessionId },
   });
   if (error) throw error;
