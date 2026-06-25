@@ -1,0 +1,17 @@
+node_modules/
+dist/
+*.log
+
+# env / secrets
+.env
+.env.local
+.env.*.local
+
+# supabase local
+supabase/.branches
+supabase/.temp
+
+# editor / os
+.DS_Store
+.vscode/
+.idea/
