@@ -1,18 +1,38 @@
 import { useState, useRef, useEffect } from 'react';
 import { character, world, recentEntries } from './lib/fixtures';
 import { sendMessage, isLiveBackend } from './lib/api';
+import { signOut } from './lib/auth';
+import { supabase } from './lib/supabase';
+import { Login } from './Login';
 import type { ChatTurn } from './lib/mockBackend';
+import type { Session } from '@supabase/supabase-js';
 
 export function App() {
   const [messages, setMessages] = useState<ChatTurn[]>([]);
   const [input, setInput] = useState('');
   const [pending, setPending] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  // 正式後端需登入；demo 模式直接視為就緒。
+  const [session, setSession] = useState<Session | null>(null);
+  const [authReady, setAuthReady] = useState(!isLiveBackend);
   const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isLiveBackend || !supabase) return;
+    supabase.auth.getSession().then(({ data }) => {
+      setSession(data.session);
+      setAuthReady(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, pending]);
+
+  if (isLiveBackend && !authReady) return <div className="login" />;
+  if (isLiveBackend && !session) return <Login />;
 
   async function handleSend() {
     const text = input.trim();
@@ -126,6 +146,12 @@ export function App() {
             </div>
           </div>
         ))}
+
+        {isLiveBackend && (
+          <button className="logout-btn" onClick={() => signOut()}>
+            登出
+          </button>
+        )}
       </aside>
     </div>
   );
