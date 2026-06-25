@@ -1,19 +1,44 @@
 import { supabase } from './supabase';
+import { mockReply, type ChatTurn } from './mockBackend';
 
-// 需要密鑰 / 特權的操作一律透過 Edge Functions，不在前端直接呼叫 OpenRouter。
-// functions.invoke 會自動帶上登入使用者的 JWT。
+// 是否已設定真正的後端。未設定時走本機 mock，讓 UI 能即時開發與檢視。
+export const isLiveBackend = Boolean(
+  import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
+);
 
-export async function sendMessage(input: {
+export interface SendMessageInput {
   sessionId?: string;
   characterId: string;
   message: string;
-}) {
-  const { data, error } = await supabase.functions.invoke('roleplay', { body: input });
+  history: ChatTurn[];
+}
+
+export interface SendMessageResult {
+  reply: string;
+  sessionId?: string;
+}
+
+// 需要密鑰 / 特權的操作一律透過 Edge Functions，不在前端直接呼叫 OpenRouter。
+export async function sendMessage(input: SendMessageInput): Promise<SendMessageResult> {
+  if (!isLiveBackend) {
+    // demo 模式：模擬一點延遲，回傳 mock 回覆
+    await new Promise((r) => setTimeout(r, 450));
+    return { reply: mockReply(input.history, input.message) };
+  }
+
+  const { data, error } = await supabase.functions.invoke('roleplay', {
+    body: {
+      sessionId: input.sessionId,
+      characterId: input.characterId,
+      message: input.message,
+    },
+  });
   if (error) throw error;
-  return data;
+  return data as SendMessageResult;
 }
 
 export async function endSession(sessionId: string) {
+  if (!isLiveBackend) return { ok: true };
   const { data, error } = await supabase.functions.invoke('session-summary', {
     body: { sessionId },
   });

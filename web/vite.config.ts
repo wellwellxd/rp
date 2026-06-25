@@ -1,10 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// GitHub Pages 在 https://<user>.github.io/<repo>/ 提供服務，需設定 base 為 "/<repo>/"。
-// 用 custom domain 或 <user>.github.io 根網域時，改回 "/"。
-// 可用環境變數覆寫：VITE_BASE=/rp-claude/ npm run build
-export default defineConfig({
+// 開發時用根路徑 "/"，方便本機預覽。
+// 正式 build 到 GitHub Pages 時才套用子路徑（專案頁面為 /<repo>/）。
+// custom domain 或 <user>.github.io 根網域：把 VITE_BASE 設為 "/"。
+export default defineConfig(({ command }) => ({
   plugins: [react()],
-  base: process.env.VITE_BASE ?? '/rp-claude/',
-});
+  base: command === 'build' ? process.env.VITE_BASE ?? '/rp-claude/' : '/',
+}));
