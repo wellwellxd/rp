@@ -67,6 +67,34 @@ body {
   background: var(--accent); color: #0b1320; border: none; border-radius: 14px;
   font-weight: 600; font-size: 0.95rem; cursor: pointer;
 }
+.new-chat:disabled { opacity: 0.45; }
+
+/* 角色列：主按鈕 + 編輯鈕並排 */
+.char-row { display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 0.6rem; }
+.char-main {
+  flex: 1; min-width: 0; text-align: left;
+  background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 0.85rem 0.95rem;
+  color: var(--text); cursor: pointer; font: inherit;
+}
+.char-main:active { background: #243043; }
+.char-edit { flex: none; align-self: center; }
+
+/* ── 角色編輯表單 ── */
+.form .form-section {
+  font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--muted); margin: 1rem 0 0.5rem;
+}
+.field { display: block; margin-bottom: 0.7rem; }
+.field > span { display: block; font-size: 0.78rem; color: var(--muted); margin-bottom: 0.3rem; }
+.field input, .field textarea {
+  width: 100%; box-sizing: border-box;
+  background: var(--panel-2); color: var(--text);
+  border: 1px solid var(--border); border-radius: 12px; padding: 0.55rem 0.7rem;
+  font: inherit; font-size: 16px; /* 16px：避免 iOS 自動放大 */
+}
+.field textarea { resize: vertical; line-height: 1.5; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--accent); }
 
 /* ── 頂部 app bar ── */
 .appbar {

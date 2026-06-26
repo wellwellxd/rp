@@ -52,7 +52,8 @@ Supabase（專案 ref: axzgcyxszhaqynxhyxxd）
 
 - ⬜ **B）自動日記**：每日 Cron 觸發 `daily-diary`（stub）；需 guard（`_shared/guard.ts` stub）
 - ✅ **C）部署 GitHub Pages**：已上線 → **https://wellwellxd.github.io/rp/**（repo `wellwellxd/rp`，push `main` 自動部署）
-- ⬜ **D）角色新增/編輯介面**：目前角色靠 seed.sql 種；前端還沒有建立角色的 UI
+- ✅ **D）角色新增/編輯介面**：前端可建立／編輯角色（含其世界＋可選開場近期生活）；寫入走 `character-admin` function（service-role）。
+  尚未做：刪除角色、共用世界、owner_id 多租戶隔離（目前任何登入者都能改任何角色，單一創作者 MVP 可接受）。
 - ⬜ 記憶檢索（pgvector）、weekly/monthly 彙整：`memory_embeddings` 表在、邏輯未做
 - ⬜ append-only 記憶續寫、canon amendments 的實際運用
 - ⬜ **CORS 收斂（hardening）**：function 的 `ALLOWED_ORIGIN` 目前未設＝`*`（本機與線上都能呼叫；JWT+RLS 才是真正邊界）。
@@ -67,7 +68,7 @@ Supabase（專案 ref: axzgcyxszhaqynxhyxxd）
 | Pages 設定 | Source = GitHub Actions；Actions Variables：`VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` / `VITE_BASE=/rp/` |
 | Supabase Project URL | `https://axzgcyxszhaqynxhyxxd.supabase.co` |
 | Project ref | `axzgcyxszhaqynxhyxxd` |
-| Edge Function | `roleplay`、`session-summary` 已部署，**verify_jwt 開啟**（需登入才能呼叫）|
+| Edge Function | `roleplay`、`session-summary`、`character-admin` 已部署，**verify_jwt 開啟**（需登入才能呼叫）|
 | Function secret | `OPENROUTER_API_KEY` 已設；模型可用 `MODEL_ROLEPLAY` 覆寫（預設 `anthropic/claude-sonnet-4.6`）|
 | Auth | email/密碼；測試帳號 `rogermoc@gmail.com`（密碼不入庫，本機自行保管）|
 | 匿名登入 | 未啟用（走正式登入）|
@@ -115,8 +116,10 @@ supabase/
   migrations/0003_character_calendar.sql  characters.initial_date / sessions.session_date + 自動推進 trigger（🟡 待跑）
   seed.sql                             兩個角色（凜 / 澄），各自帶 initial_date
   functions/roleplay/index.ts          ✅ 已實作（DB-backed + 持久化）
-  functions/session-summary/index.ts   ✅ 已實作（🟡 待部署）—— session → interaction 日記
+  functions/session-summary/index.ts   ✅ 已部署 —— session → interaction 日記
+  functions/character-admin/index.ts   ✅ 已部署 —— 建立/編輯角色（含世界）
   functions/daily-diary|periodic-summary/   ⬜ 還是 stub
+  web/src/views/CharacterEditor.tsx    ✅ 角色新增/編輯表單
   functions/_shared/  cors · openrouter(已實作 chat) · supabase · types · prompt(stub) · guard(stub)
 ```
 

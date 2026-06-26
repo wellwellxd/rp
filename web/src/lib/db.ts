@@ -57,6 +57,46 @@ export async function listCharacters(): Promise<CharacterRow[]> {
   return data ?? [];
 }
 
+export interface CharacterFull {
+  id: string;
+  world_id: string;
+  name: string;
+  occupation: string | null;
+  persona_core: string;
+  voice_style: string | null;
+  core_values: string | null;
+  backstory: string | null;
+  initial_date: string;
+  world_name: string;
+  world_canon: string;
+}
+
+// 載入單一角色的完整可編輯欄位（含其世界名稱與設定）。
+export async function getCharacterFull(id: string): Promise<CharacterFull | null> {
+  const { data, error } = await db()
+    .from('characters')
+    .select('id, world_id, name, occupation, persona_core, voice_style, core_values, backstory, initial_date, worlds(name, world_canon)')
+    .eq('id', id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  // supabase 巢狀關聯回傳 worlds 物件
+  const world = (data as unknown as { worlds: { name: string; world_canon: string } | null }).worlds;
+  return {
+    id: data.id,
+    world_id: data.world_id,
+    name: data.name,
+    occupation: data.occupation,
+    persona_core: data.persona_core,
+    voice_style: data.voice_style,
+    core_values: data.core_values,
+    backstory: data.backstory,
+    initial_date: data.initial_date,
+    world_name: world?.name ?? '',
+    world_canon: world?.world_canon ?? '',
+  };
+}
+
 export async function getWorld(worldId: string): Promise<WorldRow | null> {
   const { data, error } = await db()
     .from('worlds')

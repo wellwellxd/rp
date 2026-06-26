@@ -3,6 +3,7 @@ import { isLiveBackend } from './lib/api';
 import { supabase } from './lib/supabase';
 import { Login } from './Login';
 import { CharacterList } from './views/CharacterList';
+import { CharacterEditor } from './views/CharacterEditor';
 import { SessionList } from './views/SessionList';
 import { ChatView } from './views/ChatView';
 import type { CharacterRow, SessionRow } from './lib/db';
@@ -10,6 +11,8 @@ import type { Session } from '@supabase/supabase-js';
 
 type View =
   | { name: 'characters' }
+  | { name: 'editor'; mode: 'create' }
+  | { name: 'editor'; mode: 'edit'; characterId: string }
   | { name: 'sessions'; character: CharacterRow }
   | { name: 'chat'; character: CharacterRow; session: SessionRow };
 
@@ -46,7 +49,23 @@ export function App() {
   if (!session) return <Login />;
 
   if (view.name === 'characters') {
-    return <CharacterList onPick={(character) => setView({ name: 'sessions', character })} />;
+    return (
+      <CharacterList
+        onPick={(character) => setView({ name: 'sessions', character })}
+        onCreate={() => setView({ name: 'editor', mode: 'create' })}
+        onEdit={(characterId) => setView({ name: 'editor', mode: 'edit', characterId })}
+      />
+    );
+  }
+  if (view.name === 'editor') {
+    return (
+      <CharacterEditor
+        mode={view.mode}
+        characterId={view.mode === 'edit' ? view.characterId : undefined}
+        onBack={() => setView({ name: 'characters' })}
+        onSaved={() => setView({ name: 'characters' })}
+      />
+    );
   }
   if (view.name === 'sessions') {
     return (
