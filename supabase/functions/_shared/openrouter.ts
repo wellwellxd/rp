@@ -34,7 +34,9 @@ export async function chat(opts: ChatOptions): Promise<string> {
     }),
   });
   if (!res.ok) {
-    throw new Error(`OpenRouter ${res.status}: ${await res.text()}`);
+    const body = await res.text();
+    console.error(`OpenRouter error: model=${opts.model} status=${res.status} body=${body.slice(0, 500)}`);
+    throw new Error(`OpenRouter ${res.status}: ${body.slice(0, 300)}`);
   }
   const data = await res.json();
   const content = data?.choices?.[0]?.message?.content;
