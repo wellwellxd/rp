@@ -11,6 +11,7 @@ export interface CharacterRow {
   persona_core: string;
   occupation: string | null;
   voice_style: string | null;
+  model: string | null;
 }
 
 export interface WorldRow {
@@ -51,7 +52,7 @@ function db() {
 export async function listCharacters(): Promise<CharacterRow[]> {
   const { data, error } = await db()
     .from('characters')
-    .select('id, world_id, name, persona_core, occupation, voice_style')
+    .select('id, world_id, name, persona_core, occupation, voice_style, model')
     .order('name');
   if (error) throw error;
   return data ?? [];
@@ -67,6 +68,7 @@ export interface CharacterFull {
   core_values: string | null;
   backstory: string | null;
   initial_date: string;
+  model: string | null;
   world_name: string;
   world_canon: string;
 }
@@ -75,7 +77,7 @@ export interface CharacterFull {
 export async function getCharacterFull(id: string): Promise<CharacterFull | null> {
   const { data, error } = await db()
     .from('characters')
-    .select('id, world_id, name, occupation, persona_core, voice_style, core_values, backstory, initial_date, worlds(name, world_canon)')
+    .select('id, world_id, name, occupation, persona_core, voice_style, core_values, backstory, initial_date, model, worlds(name, world_canon)')
     .eq('id', id)
     .maybeSingle();
   if (error) throw error;
@@ -92,6 +94,7 @@ export async function getCharacterFull(id: string): Promise<CharacterFull | null
     core_values: data.core_values,
     backstory: data.backstory,
     initial_date: data.initial_date,
+    model: data.model,
     world_name: world?.name ?? '',
     world_canon: world?.world_canon ?? '',
   };

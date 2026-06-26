@@ -4,6 +4,17 @@ import { saveCharacter } from '../lib/api';
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
+// 精選對 RP 較合適的 OpenRouter 模型（皆已確認在架上）。'' = 用後端環境預設。
+const MODEL_PRESETS: { id: string; label: string }[] = [
+  { id: '', label: '預設（Claude Sonnet 4.6）' },
+  { id: 'z-ai/glm-4.6', label: 'GLM 4.6（社群公認適合 RP）' },
+  { id: 'z-ai/glm-4.7', label: 'GLM 4.7（較新）' },
+  { id: 'qwen/qwen3-235b-a22b-2507', label: 'Qwen3 235B（大、便宜、長上下文）' },
+  { id: 'qwen/qwen-2.5-72b-instruct', label: 'Qwen2.5 72B Instruct（經典）' },
+];
+const CUSTOM = '__custom__';
+const isPreset = (id: string) => MODEL_PRESETS.some((m) => m.id === id);
+
 export function CharacterEditor({
   mode,
   characterId,
@@ -22,6 +33,8 @@ export function CharacterEditor({
   const [voiceStyle, setVoiceStyle] = useState('');
   const [coreValues, setCoreValues] = useState('');
   const [backstory, setBackstory] = useState('');
+  const [model, setModel] = useState('');
+  const [modelMode, setModelMode] = useState<'preset' | 'custom'>('preset');
   const [initialDate, setInitialDate] = useState(todayISO());
   // 世界欄位
   const [worldName, setWorldName] = useState('');
@@ -50,6 +63,8 @@ export function CharacterEditor({
           setVoiceStyle(c.voice_style ?? '');
           setCoreValues(c.core_values ?? '');
           setBackstory(c.backstory ?? '');
+          setModel(c.model ?? '');
+          setModelMode(c.model && !isPreset(c.model) ? 'custom' : 'preset');
           setInitialDate(c.initial_date);
           setWorldName(c.world_name);
           setWorldCanon(c.world_canon);
@@ -77,6 +92,7 @@ export function CharacterEditor({
           voice_style: voiceStyle,
           core_values: coreValues,
           backstory,
+          model,
           ...(mode === 'create' ? { initial_date: initialDate } : {}),
         },
         world: {
@@ -136,6 +152,39 @@ export function CharacterEditor({
               <span>背景故事</span>
               <textarea rows={3} value={backstory} onChange={(e) => setBackstory(e.target.value)} placeholder="可留空" />
             </label>
+            <label className="field">
+              <span>對話模型</span>
+              <select
+                value={modelMode === 'custom' ? CUSTOM : model}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  if (v === CUSTOM) {
+                    setModelMode('custom');
+                  } else {
+                    setModelMode('preset');
+                    setModel(v);
+                  }
+                }}
+              >
+                {MODEL_PRESETS.map((m) => (
+                  <option key={m.id || 'default'} value={m.id}>{m.label}</option>
+                ))}
+                <option value={CUSTOM}>自訂…</option>
+              </select>
+            </label>
+            {modelMode === 'custom' && (
+              <label className="field">
+                <span>自訂模型 id（OpenRouter）</span>
+                <input
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  placeholder="例：z-ai/glm-5、qwen/qwen3-max"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                />
+              </label>
+            )}
             {mode === 'create' && (
               <label className="field">
                 <span>起始日期（角色生活時間線的第一天）</span>

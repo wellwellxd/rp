@@ -202,6 +202,9 @@ export function ChatView({
         <div className="section-title">人格</div>
         <p className="canon">{character.persona_core}</p>
 
+        <div className="section-title">對話模型</div>
+        <p className="canon">{character.model || '預設（Claude Sonnet 4.6）'}</p>
+
         <div className="section-title">近期生活</div>
         {life.length === 0 && <p className="canon">（尚無記錄）</p>}
         {life.map((e) => (

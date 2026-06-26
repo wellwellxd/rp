@@ -64,6 +64,7 @@ export interface CharacterInput {
     core_values?: string;
     backstory?: string;
     initial_date?: string;
+    model?: string;
   };
   world: {
     name?: string;

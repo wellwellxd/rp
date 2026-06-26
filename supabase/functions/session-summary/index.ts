@@ -10,7 +10,7 @@ import { handleOptions, json } from '../_shared/cors.ts';
 import { chat } from '../_shared/openrouter.ts';
 import { getServiceClient, getUserClient } from '../_shared/supabase.ts';
 
-const MODEL = Deno.env.get('MODEL_SUMMARY') ?? Deno.env.get('MODEL_ROLEPLAY') ??
+const DEFAULT_MODEL = Deno.env.get('MODEL_SUMMARY') ?? Deno.env.get('MODEL_ROLEPLAY') ??
   'anthropic/claude-sonnet-4.6';
 
 interface SessionSummaryRequest {
@@ -136,8 +136,9 @@ Deno.serve(async (req) => {
       .join('\n');
 
     const prompt = buildDiaryPrompt(character, world, sessionDate, transcript);
+    const model = (character.model ?? '').trim() || DEFAULT_MODEL;
     const reply = await chat({
-      model: MODEL,
+      model,
       system: prompt,
       messages: [{ role: 'user', content: '請寫下今天的日記。' }],
       temperature: 0.7,

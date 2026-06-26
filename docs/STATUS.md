@@ -54,6 +54,10 @@ Supabase（專案 ref: axzgcyxszhaqynxhyxxd）
 - ✅ **C）部署 GitHub Pages**：已上線 → **https://wellwellxd.github.io/rp/**（repo `wellwellxd/rp`，push `main` 自動部署）
 - ✅ **D）角色新增/編輯介面**：前端可建立／編輯角色（含其世界＋可選開場近期生活）；寫入走 `character-admin` function（service-role）。
   尚未做：刪除角色、共用世界、owner_id 多租戶隔離（目前任何登入者都能改任何角色，單一創作者 MVP 可接受）。
+- ✅ **每角色可切換 LLM 模型**（`characters.model`，migration 0004）：編輯表單可選精選 RP 模型或自訂 OpenRouter id；
+  空值＝沿用環境預設（`MODEL_ROLEPLAY`/`MODEL_SUMMARY`，預設 `anthropic/claude-sonnet-4.6`）。roleplay 與 session-summary 皆套用該角色模型。
+  精選清單（2026-06-26 確認在 OpenRouter 架上）：`z-ai/glm-4.6`、`z-ai/glm-4.7`、`qwen/qwen3-235b-a22b-2507`、`qwen/qwen-2.5-72b-instruct`。
+  注意：清單＝目錄存在；實際生成可用性需在 App 內實測（OpenRouter key 只在 function secret，無法本機直接驗）。
 - ⬜ 記憶檢索（pgvector）、weekly/monthly 彙整：`memory_embeddings` 表在、邏輯未做
 - ⬜ append-only 記憶續寫、canon amendments 的實際運用
 - ⬜ **CORS 收斂（hardening）**：function 的 `ALLOWED_ORIGIN` 目前未設＝`*`（本機與線上都能呼叫；JWT+RLS 才是真正邊界）。

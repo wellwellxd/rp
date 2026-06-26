@@ -12,6 +12,7 @@ interface CharacterFields {
   core_values?: string;
   backstory?: string;
   initial_date?: string; // YYYY-MM-DD
+  model?: string;        // OpenRouter model id；空 = 用環境預設
 }
 interface WorldFields {
   name?: string;
@@ -83,6 +84,7 @@ Deno.serve(async (req) => {
         voice_style: clean(c.voice_style),
         core_values: clean(c.core_values),
         backstory: clean(c.backstory),
+        model: clean(c.model),
       };
       if (initialDate) charRow.initial_date = initialDate;
       const { data: character, error: cErr } = await svc
@@ -131,6 +133,7 @@ Deno.serve(async (req) => {
       if (c.voice_style !== undefined) charUpd.voice_style = clean(c.voice_style);
       if (c.core_values !== undefined) charUpd.core_values = clean(c.core_values);
       if (c.backstory !== undefined) charUpd.backstory = clean(c.backstory);
+      if (c.model !== undefined) charUpd.model = clean(c.model);
 
       const { error: cErr } = await svc
         .from('characters').update(charUpd).eq('id', body.characterId);

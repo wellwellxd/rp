@@ -5,7 +5,7 @@ import { handleOptions, json } from '../_shared/cors.ts';
 import { chat } from '../_shared/openrouter.ts';
 import { getServiceClient, getUserClient } from '../_shared/supabase.ts';
 
-const MODEL = Deno.env.get('MODEL_ROLEPLAY') ?? 'anthropic/claude-sonnet-4.6';
+const DEFAULT_MODEL = Deno.env.get('MODEL_ROLEPLAY') ?? 'anthropic/claude-sonnet-4.6';
 
 interface RoleplayRequest {
   characterId: string;
@@ -81,7 +81,8 @@ Deno.serve(async (req) => {
         ? body.history
         : [{ role: 'user' as const, content: body.message }];
 
-    const reply = await chat({ model: MODEL, system, messages: conversation });
+    const model = (character.model ?? '').trim() || DEFAULT_MODEL;
+    const reply = await chat({ model, system, messages: conversation });
 
     // 持久化本輪訊息（確認 session 屬於該使用者後才寫）
     if (body.sessionId) {
