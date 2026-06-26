@@ -68,6 +68,19 @@ body {
   font-weight: 600; font-size: 0.95rem; cursor: pointer;
 }
 .new-chat:disabled { opacity: 0.45; }
+.ghost-btn {
+  width: 100%; height: 44px; margin-bottom: 0.9rem;
+  background: transparent; color: var(--text);
+  border: 1px solid var(--border); border-radius: 14px;
+  font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+.ghost-btn:active { background: var(--panel-2); }
+.ghost-btn:disabled { opacity: 0.6; }
+/* 近期生活卡片（SessionList 內） */
+.life-entry.boxed {
+  background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 0.8rem 0.95rem; margin-bottom: 0.6rem;
+}
 
 /* 角色列：主按鈕 + 編輯鈕並排 */
 .char-row { display: flex; gap: 0.5rem; align-items: stretch; margin-bottom: 0.6rem; }

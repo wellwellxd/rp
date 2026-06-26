@@ -50,7 +50,10 @@ Supabase（專案 ref: axzgcyxszhaqynxhyxxd）
 
 ## 尚未做（下一步候選）
 
-- ⬜ **B）自動日記**：每日 Cron 觸發 `daily-diary`（stub）；需 guard（`_shared/guard.ts` stub）
+- 🟡 **B）自動日記（角色自行渡過一天）**：`daily-diary` function 已實作並部署、`_shared/guard.ts` 已實作（硬規則＋關鍵字守門）。
+  前端在角色頁有「🌙 讓〈角色〉自己過一天」按鈕（手動觸發），產生 autonomous 日記、日期 = 時間線最後一天 +1、過 guard 才寫入。
+  **尚未做**：Supabase Cron（pg_cron + pg_net）每日自動觸發（function 已支援不帶 characterId → 處理全部角色，但 verify_jwt 開著，cron 需另以 service-role/secret 呼叫）。
+  guard 為 v1 關鍵字版，之後可加一次 LLM 分類強化。
 - ✅ **C）部署 GitHub Pages**：已上線 → **https://wellwellxd.github.io/rp/**（repo `wellwellxd/rp`，push `main` 自動部署）
 - ✅ **D）角色新增/編輯介面**：前端可建立／編輯角色（含其世界＋可選開場近期生活）；寫入走 `character-admin` function（service-role）。
   尚未做：刪除角色、共用世界、owner_id 多租戶隔離（目前任何登入者都能改任何角色，單一創作者 MVP 可接受）。

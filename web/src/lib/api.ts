@@ -90,6 +90,12 @@ export interface CharacterInput {
 }
 
 // 建立 / 編輯角色（含其世界）——共享 canon 寫入走 character-admin function（service-role）。
+// 讓角色自行渡過一天 → daily-diary function 產生一篇 autonomous 日記（須過 guard）。
+export async function passADay(characterId: string): Promise<DiaryResult> {
+  const data = await invokeFn<{ entry: DiaryResult }>('daily-diary', { characterId });
+  return data.entry;
+}
+
 export async function saveCharacter(
   input: CharacterInput & { action: 'create' | 'update'; characterId?: string },
 ): Promise<string> {
