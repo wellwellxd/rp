@@ -141,6 +141,29 @@ body {
   border-bottom-left-radius: 5px;
 }
 .msg .who { font-size: 0.68rem; color: var(--muted); margin-bottom: 0.2rem; }
+
+/* ── Markdown 內容（對話泡泡 / 日記）── */
+.md > *:first-child { margin-top: 0; }
+.md > *:last-child { margin-bottom: 0; }
+.md p { margin: 0 0 0.5em; }
+.md em { font-style: italic; opacity: 0.82; }       /* *動作* 視覺上稍微區隔 */
+.md strong { font-weight: 700; }
+.md ul, .md ol { margin: 0.3em 0; padding-left: 1.25em; }
+.md li { margin: 0.15em 0; }
+.md a { color: var(--accent); }
+.md code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.05em 0.3em; border-radius: 4px; font-size: 0.9em;
+}
+.md pre {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.6em 0.7em; border-radius: 8px; overflow-x: auto;
+}
+.md pre code { background: none; padding: 0; }
+.md blockquote {
+  margin: 0.3em 0; padding-left: 0.7em;
+  border-left: 2px solid var(--border); color: var(--muted);
+}
 .typing { color: var(--muted); font-size: 0.85rem; padding: 0 0.9rem 0.5rem; }
 .empty-hint { color: var(--muted); text-align: center; margin-top: 18vh; font-size: 0.9rem; padding: 0 1.5rem; }
 
@@ -193,7 +216,7 @@ body {
   color: var(--accent); margin-bottom: 0.5rem;
 }
 .diary-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
-.diary-body { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
+.diary-body { font-size: 0.9rem; line-height: 1.6; }
 .diary-meta { font-size: 0.74rem; color: var(--muted); margin-top: 0.5rem; }
 
 /* ── 抽屜（角色 / 世界 / 近期生活）── */

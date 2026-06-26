@@ -11,6 +11,7 @@ import {
   type WorldRow,
 } from '../lib/db';
 import { sendMessage, endSession, type ChatTurn } from '../lib/api';
+import { Markdown } from '../components/Markdown';
 
 function fmtDate(d: string | null | undefined) {
   if (!d) return '';
@@ -130,7 +131,7 @@ export function ChatView({
           <div className={`msg ${m.role}`} key={i}>
             <div className="bubble">
               <div className="who">{m.role === 'user' ? '你' : character.name}</div>
-              {m.content}
+              <Markdown>{m.content}</Markdown>
             </div>
           </div>
         ))}
@@ -144,7 +145,7 @@ export function ChatView({
             {diary ? (
               <>
                 {diary.title && <div className="diary-title">{diary.title}</div>}
-                <div className="diary-body">{diary.content}</div>
+                <div className="diary-body"><Markdown>{diary.content}</Markdown></div>
                 {(diary.emotional_state || diary.location) && (
                   <div className="diary-meta">
                     {[diary.emotional_state, diary.location].filter(Boolean).join(' · ')}

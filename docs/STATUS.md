@@ -58,6 +58,8 @@ Supabase（專案 ref: axzgcyxszhaqynxhyxxd）
   空值＝沿用環境預設（`MODEL_ROLEPLAY`/`MODEL_SUMMARY`，預設 `anthropic/claude-sonnet-4.6`）。roleplay 與 session-summary 皆套用該角色模型。
   精選清單（2026-06-26 確認在 OpenRouter 架上）：`z-ai/glm-4.6`、`z-ai/glm-4.7`、`qwen/qwen3-235b-a22b-2507`、`qwen/qwen-2.5-72b-instruct`。
   注意：清單＝目錄存在；實際生成可用性需在 App 內實測（OpenRouter key 只在 function secret，無法本機直接驗）。
+- ✅ **RP 排版慣例 + Markdown 對話框**：roleplay 系統提示加入「*星號*=動作/情境敘述」慣例；前端對話泡泡與日記改用 react-markdown
+  （remark-gfm + remark-breaks）渲染，`*動作*` 自動顯示為斜體。元件：`web/src/components/Markdown.tsx`。
 - ⬜ 記憶檢索（pgvector）、weekly/monthly 彙整：`memory_embeddings` 表在、邏輯未做
 - ⬜ append-only 記憶續寫、canon amendments 的實際運用
 - ⬜ **CORS 收斂（hardening）**：function 的 `ALLOWED_ORIGIN` 目前未設＝`*`（本機與線上都能呼叫；JWT+RLS 才是真正邊界）。
