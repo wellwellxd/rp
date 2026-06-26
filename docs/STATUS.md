@@ -51,18 +51,23 @@ Supabase（專案 ref: axzgcyxszhaqynxhyxxd）
 ## 尚未做（下一步候選）
 
 - ⬜ **B）自動日記**：每日 Cron 觸發 `daily-diary`（stub）；需 guard（`_shared/guard.ts` stub）
-- ⬜ **C）部署 GitHub Pages**：workflow 已備（`.github/workflows/deploy-pages.yml`），尚未啟用
+- ✅ **C）部署 GitHub Pages**：已上線 → **https://wellwellxd.github.io/rp/**（repo `wellwellxd/rp`，push `main` 自動部署）
 - ⬜ **D）角色新增/編輯介面**：目前角色靠 seed.sql 種；前端還沒有建立角色的 UI
 - ⬜ 記憶檢索（pgvector）、weekly/monthly 彙整：`memory_embeddings` 表在、邏輯未做
 - ⬜ append-only 記憶續寫、canon amendments 的實際運用
+- ⬜ **CORS 收斂（hardening）**：function 的 `ALLOWED_ORIGIN` 目前未設＝`*`（本機與線上都能呼叫；JWT+RLS 才是真正邊界）。
+  要鎖白名單需小改 `_shared/cors.ts` 支援多來源（逐請求回填 Origin），否則鎖單一來源會擋掉 localhost 開發。
+- ⬜ workflow 用的 actions 版本觸發 Node 20 deprecation 警告（不影響部署），有空可升 `checkout@v5`/`setup-node@v5`。
 
 ## 雲端資源現況
 
 | 項目 | 值 / 狀態 |
 |---|---|
+| 線上網址（GitHub Pages） | **https://wellwellxd.github.io/rp/**（repo `wellwellxd/rp`，push `main` 自動部署）|
+| Pages 設定 | Source = GitHub Actions；Actions Variables：`VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` / `VITE_BASE=/rp/` |
 | Supabase Project URL | `https://axzgcyxszhaqynxhyxxd.supabase.co` |
 | Project ref | `axzgcyxszhaqynxhyxxd` |
-| Edge Function | `roleplay` 已部署，**verify_jwt 開啟**（需登入才能呼叫）|
+| Edge Function | `roleplay`、`session-summary` 已部署，**verify_jwt 開啟**（需登入才能呼叫）|
 | Function secret | `OPENROUTER_API_KEY` 已設；模型可用 `MODEL_ROLEPLAY` 覆寫（預設 `anthropic/claude-sonnet-4.6`）|
 | Auth | email/密碼；測試帳號 `rogermoc@gmail.com`（密碼不入庫，本機自行保管）|
 | 匿名登入 | 未啟用（走正式登入）|
