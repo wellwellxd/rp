@@ -136,6 +136,37 @@ body {
 }
 .composer button:disabled { opacity: 0.45; }
 
+/* 鎖定（已整理成日記）狀態的輸入列 */
+.composer.locked { justify-content: center; }
+.locked-note { color: var(--muted); font-size: 0.82rem; text-align: center; }
+
+/* ── 結束對話／整理成日記 ── */
+.session-actions {
+  display: flex; flex-direction: column; align-items: stretch; gap: 0.4rem;
+  padding: 0.5rem 0.9rem 0;
+}
+.session-actions .hint.err { padding: 0; text-align: left; }
+.summarize-btn {
+  align-self: center; background: transparent; color: var(--accent);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 0.45rem 1rem; font: inherit; font-size: 0.85rem; cursor: pointer;
+}
+.summarize-btn:disabled { opacity: 0.45; }
+
+/* ── 日記卡片（session 結束後顯示在對話底部）── */
+.diary-card {
+  margin: 0.6rem 0.9rem 0.2rem;
+  background: var(--panel-2); border: 1px solid var(--border);
+  border-radius: 14px; padding: 0.9rem 1rem;
+}
+.diary-head {
+  font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 0.5rem;
+}
+.diary-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
+.diary-body { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
+.diary-meta { font-size: 0.74rem; color: var(--muted); margin-top: 0.5rem; }
+
 /* ── 抽屜（角色 / 世界 / 近期生活）── */
 .scrim {
   position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5);

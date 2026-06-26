@@ -34,3 +34,23 @@ export async function sendMessage(input: SendMessageInput): Promise<SendMessageR
   if (data?.error) throw new Error(data.error);
   return data as SendMessageResult;
 }
+
+export interface DiaryResult {
+  id: string;
+  entry_date: string;
+  title: string | null;
+  content: string;
+  emotional_state: string | null;
+  location: string | null;
+}
+
+// 結束對話 → session-summary function 把這段 session 整理成一篇日記並鎖成唯讀。
+export async function endSession(sessionId: string): Promise<DiaryResult> {
+  if (!supabase) throw new Error('Supabase 未設定');
+  const { data, error } = await supabase.functions.invoke('session-summary', {
+    body: { sessionId },
+  });
+  if (error) throw error;
+  if (data?.error) throw new Error(data.error);
+  return data.entry as DiaryResult;
+}

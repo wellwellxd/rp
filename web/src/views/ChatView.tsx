@@ -1,21 +1,33 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   loadMessages,
+  loadSessionDiary,
   recentLife,
   getWorld,
   type CharacterRow,
+  type SessionRow,
+  type DiaryEntryRow,
   type LifeEntryRow,
   type WorldRow,
 } from '../lib/db';
-import { sendMessage, type ChatTurn } from '../lib/api';
+import { sendMessage, endSession, type ChatTurn } from '../lib/api';
+
+function fmtDate(d: string | null | undefined) {
+  if (!d) return '';
+  return new Date(d + 'T00:00:00').toLocaleDateString('zh-TW', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
 
 export function ChatView({
   character,
-  sessionId,
+  session,
   onBack,
 }: {
   character: CharacterRow;
-  sessionId: string;
+  session: SessionRow;
   onBack: () => void;
 }) {
   const [messages, setMessages] = useState<ChatTurn[]>([]);
@@ -24,10 +36,16 @@ export function ChatView({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [life, setLife] = useState<LifeEntryRow[]>([]);
   const [world, setWorld] = useState<WorldRow | null>(null);
+  const [summarized, setSummarized] = useState(session.session_status === 'summarized');
+  const [diary, setDiary] = useState<DiaryEntryRow | null>(null);
+  const [summarizing, setSummarizing] = useState(false);
+  const [error, setError] = useState('');
   const endRef = useRef<HTMLDivElement>(null);
 
+  const readOnly = summarized;
+
   useEffect(() => {
-    loadMessages(sessionId).then((rows) =>
+    loadMessages(session.id).then((rows) =>
       setMessages(
         rows
           .filter((m) => m.role === 'user' || m.role === 'assistant')
@@ -36,15 +54,18 @@ export function ChatView({
     );
     recentLife(character.id).then(setLife).catch(() => {});
     getWorld(character.world_id).then(setWorld).catch(() => {});
-  }, [sessionId, character.id, character.world_id]);
+    if (session.session_status === 'summarized') {
+      loadSessionDiary(session.id).then(setDiary).catch(() => {});
+    }
+  }, [session.id, session.session_status, character.id, character.world_id]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, pending]);
+  }, [messages, pending, diary]);
 
   async function handleSend() {
     const text = input.trim();
-    if (!text || pending) return;
+    if (!text || pending || readOnly) return;
     const history = [...messages, { role: 'user' as const, content: text }];
     setMessages(history);
     setInput('');
@@ -52,7 +73,7 @@ export function ChatView({
     try {
       const { reply } = await sendMessage({
         characterId: character.id,
-        sessionId,
+        sessionId: session.id,
         message: text,
         history,
       });
@@ -61,6 +82,21 @@ export function ChatView({
       setMessages([...history, { role: 'assistant', content: `（發生錯誤：${String(err)}）` }]);
     } finally {
       setPending(false);
+    }
+  }
+
+  async function handleSummarize() {
+    if (summarizing || messages.length === 0) return;
+    setError('');
+    setSummarizing(true);
+    try {
+      const entry = await endSession(session.id);
+      setDiary(entry);
+      setSummarized(true);
+    } catch (err) {
+      setError(`整理失敗：${String(err)}`);
+    } finally {
+      setSummarizing(false);
     }
   }
 
@@ -77,7 +113,9 @@ export function ChatView({
         <button className="icon-btn" aria-label="返回" onClick={onBack}>‹</button>
         <div className="title-block">
           <div className="name">{character.name}</div>
-          {world && <div className="sub">{world.name}</div>}
+          <div className="sub">
+            {[world?.name, fmtDate(session.session_date)].filter(Boolean).join(' · ')}
+          </div>
         </div>
         <button className="icon-btn" aria-label="角色資訊" onClick={() => setDrawerOpen(true)}>☰</button>
       </header>
@@ -97,19 +135,56 @@ export function ChatView({
           </div>
         ))}
         {pending && <div className="typing">{character.name} 正在回覆…</div>}
+
+        {readOnly && (
+          <div className="diary-card">
+            <div className="diary-head">
+              {character.name} 的日記 · {fmtDate(diary?.entry_date ?? session.session_date)}
+            </div>
+            {diary ? (
+              <>
+                {diary.title && <div className="diary-title">{diary.title}</div>}
+                <div className="diary-body">{diary.content}</div>
+                {(diary.emotional_state || diary.location) && (
+                  <div className="diary-meta">
+                    {[diary.emotional_state, diary.location].filter(Boolean).join(' · ')}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="diary-body">（這段對話已整理成日記。）</div>
+            )}
+          </div>
+        )}
         <div ref={endRef} />
       </div>
 
-      <div className="composer">
-        <textarea
-          rows={1}
-          value={input}
-          placeholder="說點什麼…"
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={onKeyDown}
-        />
-        <button onClick={handleSend} disabled={pending || !input.trim()}>送出</button>
-      </div>
+      {readOnly ? (
+        <div className="composer locked">
+          <span className="locked-note">這段對話已整理成日記，無法再回覆。</span>
+        </div>
+      ) : (
+        <>
+          {messages.length > 0 && (
+            <div className="session-actions">
+              {error && <span className="hint err">{error}</span>}
+              <button className="summarize-btn" onClick={handleSummarize} disabled={summarizing || pending}>
+                {summarizing ? '整理中…' : '結束對話並整理成日記'}
+              </button>
+            </div>
+          )}
+          <div className="composer">
+            <textarea
+              rows={1}
+              value={input}
+              placeholder="說點什麼…"
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={onKeyDown}
+            />
+            <button onClick={handleSend} disabled={pending || !input.trim()}>送出</button>
+          </div>
+        </>
+      )}
 
       <div className={`scrim${drawerOpen ? ' open' : ''}`} onClick={() => setDrawerOpen(false)} />
       <aside className={`drawer${drawerOpen ? ' open' : ''}`}>

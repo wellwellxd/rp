@@ -19,13 +19,14 @@ begin
   insert into world_states (world_id, world_date, season, weather_pattern, location_state)
   values (w1, current_date, '初秋', '連續幾天降雨', '住處附近道路施工，白天略吵；港區物流延誤讓部分日用品稍微漲價。');
 
-  insert into characters (world_id, name, persona_core, voice_style, occupation, core_values)
+  insert into characters (world_id, name, persona_core, voice_style, occupation, core_values, initial_date)
   values (
     w1, '凜',
     '保守、慢熱，重視人際邊界。不喜歡吵雜失控的場合，但在熟悉的小店與穩定關係中能放鬆。',
     '平靜、簡短，偶爾停下來反思。',
     '在舊城區一間小型檔案／記憶研究機構工作',
-    '誠實、邊界、長期勝過一時。'
+    '誠實、邊界、長期勝過一時。',
+    current_date  -- 角色生活時間線的起點；最新一篇近期生活落在這天，第一段對話即此日 +1
   ) returning id into c1;
 
   insert into life_entries (character_id, world_id, entry_date, content, source_type, emotional_state, location) values
@@ -42,13 +43,14 @@ begin
   insert into world_states (world_id, world_date, season, weather_pattern, location_state)
   values (w2, current_date, '晚春', '晴朗、午後偶有陣雨', '鎮上正準備一年一度的市集，街角開始掛起布旗。');
 
-  insert into characters (world_id, name, persona_core, voice_style, occupation, core_values)
+  insert into characters (world_id, name, persona_core, voice_style, occupation, core_values, initial_date)
   values (
     w2, '澄',
     '開朗、好奇、熱心，喜歡和人聊天，但偶爾會因為太替別人著想而累。',
     '溫暖、輕快，話略多，常用具體的小事說明心情。',
     '在晴町經營一間小咖啡館',
-    '人與人之間的小小善意最值得珍惜。'
+    '人與人之間的小小善意最值得珍惜。',
+    current_date
   ) returning id into c2;
 
   insert into life_entries (character_id, world_id, entry_date, content, source_type, emotional_state, location) values

@@ -8,7 +8,7 @@ export function SessionList({
 }: {
   character: CharacterRow;
   onBack: () => void;
-  onOpen: (sessionId: string) => void;
+  onOpen: (session: SessionRow) => void;
 }) {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,19 +24,25 @@ export function SessionList({
   async function newChat() {
     try {
       const s = await createSession(character.id);
-      onOpen(s.id);
+      onOpen(s);
     } catch (e) {
       setError(String(e));
     }
   }
 
-  function fmt(ts: string) {
-    return new Date(ts).toLocaleString('zh-TW', {
-      month: 'numeric',
+  function fmtDate(d: string | null) {
+    if (!d) return '';
+    return new Date(d + 'T00:00:00').toLocaleDateString('zh-TW', {
+      year: 'numeric',
+      month: 'long',
       day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
     });
+  }
+
+  function statusLabel(s: SessionRow) {
+    if (s.session_status === 'summarized') return '已整理成日記';
+    if (s.session_status === 'ended') return '已結束';
+    return '進行中';
   }
 
   return (
@@ -56,9 +62,9 @@ export function SessionList({
           <div className="hint">還沒有對話紀錄，開一段新的吧。</div>
         )}
         {sessions.map((s) => (
-          <button className="list-item" key={s.id} onClick={() => onOpen(s.id)}>
-            <div className="li-title">對話 · {fmt(s.started_at)}</div>
-            <div className="li-sub">{s.session_status === 'active' ? '進行中' : s.session_status}</div>
+          <button className="list-item" key={s.id} onClick={() => onOpen(s)}>
+            <div className="li-title">{s.session_date ? fmtDate(s.session_date) : '對話'}</div>
+            <div className="li-sub">{statusLabel(s)}</div>
           </button>
         ))}
       </div>

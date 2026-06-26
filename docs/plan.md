@@ -77,9 +77,10 @@
 
 **目標**：對話結束後整理成日記，而不是只留聊天紀錄。
 
-- [ ] `summarizeSessionToDiary`：摘要 session → 產生 interaction life entry
-- [ ] 標記 `source_type = interaction`、`user_presence_level = interaction`、`user_agency_created = true`（唯一正當設 true 的路徑）
-- [ ] 更新 `relationship_threads`（stage、trust、shared_memory_summary、unresolved_threads）
+- [x] `session-summary` function：摘要 session → 產生 interaction life entry（日期 = 角色內在曆法 `session_date`）
+- [x] 標記 `source_type = interaction`、`user_presence_level = interaction`、`user_agency_created = true`（唯一正當設 true 的路徑）
+- [x] 更新 `relationship_threads`（shared_memory_summary、unresolved_threads；stage/trust 待補）
+- [x] 角色內在曆法：`characters.initial_date` + `sessions.session_date`（新 session = 下一天，trigger 自動推進）
 - [ ] 評估是否升級為 memory entry / canon candidate（接 P5/P6）
 
 **驗收**：一段真實對話結束後，Timeline 出現一篇 interaction entry，relationship thread 被更新（對齊 §18.3）。

@@ -35,9 +35,21 @@ Supabase（專案 ref: axzgcyxszhaqynxhyxxd）
 - ✅ 對話存檔：重整／換裝置後 session 與訊息都還在（已實測）
 - ✅ 手機/iOS 樣式（safe-area、16px 輸入不縮放、抽屜顯示角色世界+近期生活）
 
+## 已完成（live，可用）— 本輪新增
+
+- ✅ **A）Session 結束 → 整理成日記**＋**角色內在曆法**（migration 0003 已跑、`session-summary` 已部署）：
+  - **角色曆法**：`characters.initial_date`（角色生活時間線起點）、`sessions.session_date`（這段對話發生在角色生命中的哪一天）。
+    新 session 的日期 = 角色時間線目前最後一天 +1（trigger 自動算，取 `initial_date` / `life_entries` / `sessions` 三者最大值再 +1，
+    未來「角色自行渡過一天」也能自然推進）。種子角色第一段對話 = `initial_date + 1`。
+  - **整理成日記**：`session-summary` function 已實作 → 讀訊息 → LLM 第一人稱日記(JSON) → 寫 interaction `life_entry`
+    （`source_type=interaction` / `user_presence_level=interaction` / `user_agency_created=true`，日期 = `session_date`）
+    → 標記 session `summarized`（前端鎖唯讀）→ upsert `relationship_thread`。冪等。
+  - **前端**：ChatView「結束對話並整理成日記」按鈕；summarized session 唯讀並顯示當天日記卡片；SessionList 顯示角色當天日期＋狀態。
+  - **現況**：migration 0003 已套用（凜/澄 initial_date=2026-06-25，既有 3 段 session 回填為 06-26/27/28）；`session-summary` 已部署且 verify_jwt 開啟。
+    尚未經真實瀏覽器端到端跑過一次（建議下次登入後實測：開新對話→聊幾句→結束整理→確認日記寫入且 session 鎖唯讀）。
+
 ## 尚未做（下一步候選）
 
-- ⬜ **A）Session 結束 → 整理成日記**：寫入 `life_entries`（目前 `session-summary` function 還是 stub）
 - ⬜ **B）自動日記**：每日 Cron 觸發 `daily-diary`（stub）；需 guard（`_shared/guard.ts` stub）
 - ⬜ **C）部署 GitHub Pages**：workflow 已備（`.github/workflows/deploy-pages.yml`），尚未啟用
 - ⬜ **D）角色新增/編輯介面**：目前角色靠 seed.sql 種；前端還沒有建立角色的 UI
@@ -95,9 +107,11 @@ web/src/
 supabase/
   migrations/0001_initial_schema.sql   12 表 + pgvector + append-only constraint
   migrations/0002_rls_policies.sql     RLS
-  seed.sql                             兩個角色（凜 / 澄）
+  migrations/0003_character_calendar.sql  characters.initial_date / sessions.session_date + 自動推進 trigger（🟡 待跑）
+  seed.sql                             兩個角色（凜 / 澄），各自帶 initial_date
   functions/roleplay/index.ts          ✅ 已實作（DB-backed + 持久化）
-  functions/session-summary|daily-diary|periodic-summary/   ⬜ 還是 stub
+  functions/session-summary/index.ts   ✅ 已實作（🟡 待部署）—— session → interaction 日記
+  functions/daily-diary|periodic-summary/   ⬜ 還是 stub
   functions/_shared/  cors · openrouter(已實作 chat) · supabase · types · prompt(stub) · guard(stub)
 ```
 

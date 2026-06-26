@@ -5,13 +5,13 @@ import { Login } from './Login';
 import { CharacterList } from './views/CharacterList';
 import { SessionList } from './views/SessionList';
 import { ChatView } from './views/ChatView';
-import type { CharacterRow } from './lib/db';
+import type { CharacterRow, SessionRow } from './lib/db';
 import type { Session } from '@supabase/supabase-js';
 
 type View =
   | { name: 'characters' }
   | { name: 'sessions'; character: CharacterRow }
-  | { name: 'chat'; character: CharacterRow; sessionId: string };
+  | { name: 'chat'; character: CharacterRow; session: SessionRow };
 
 export function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -53,14 +53,14 @@ export function App() {
       <SessionList
         character={view.character}
         onBack={() => setView({ name: 'characters' })}
-        onOpen={(sessionId) => setView({ name: 'chat', character: view.character, sessionId })}
+        onOpen={(session) => setView({ name: 'chat', character: view.character, session })}
       />
     );
   }
   return (
     <ChatView
       character={view.character}
-      sessionId={view.sessionId}
+      session={view.session}
       onBack={() => setView({ name: 'sessions', character: view.character })}
     />
   );
